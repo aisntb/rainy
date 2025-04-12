@@ -14,6 +14,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import com.github.aisntb.rainy.listener.ListenerAdapter
+import kotlinx.coroutines.runBlocking
 
 
 class Bot(private val ip: String = "0.0.0.0") {
@@ -46,6 +47,17 @@ class Bot(private val ip: String = "0.0.0.0") {
                 }
             }
         }.start(wait = true)
+    }
+
+    suspend fun retrieveUserByIdUnblock(userId: String): MessageEvent.UserInfo? {
+        val userInfo = MessageEvent.fetchUserInfo(ip,userId)
+        return userInfo
+    }
+
+    fun retrieveUserById(userId: String): MessageEvent.UserInfo? {
+        return runBlocking {
+            retrieveUserByIdUnblock(userId)
+        }
     }
 
     @Serializable

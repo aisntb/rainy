@@ -30,29 +30,18 @@ dependencies {
 
 publishing {
     publications {
-        create<MavenPublication>("gpr") {
-            from(components["java"]) // <- core 모듈만!
-            groupId = "com.github.aisntb"
-            artifactId = "rainy"
-            version = "1.0.0"
-        }
-    }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/aisntb/rainy")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
-            }
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
         }
     }
 }
+
+
 
 tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(17)
 }
 

@@ -1,23 +1,66 @@
-# rainbow
+# rainy
 
-This project uses [Gradle](https://gradle.org/).
-To build and run the application, use the *Gradle* tool window by clicking the Gradle icon in the right-hand toolbar,
-or run it directly from the terminal:
+<img src="https://github.com/user-attachments/assets/3f3728c5-ef3e-48f8-83c9-ed22b7f6a3c2" width="200"/>
 
-* Run `./gradlew run` to build and run the application.
-* Run `./gradlew build` to only build the application.
-* Run `./gradlew check` to run all checks, including tests.
-* Run `./gradlew clean` to clean all build outputs.
+rainy는 iris와 http로 상호작용을 하면서 카카오톡에 채팅을 주고받을 수 있게 만들어 주는 모듈입니다.
+kotlin 언어로 개발되었기 때문에 java와 kotlin에서 사용가능합니다.
 
-Note the usage of the Gradle Wrapper (`./gradlew`).
-This is the suggested way to use Gradle in production projects.
+# Usage
 
-[Learn more about the Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
+setting.gradle.kts
+```kts
+dependencyResolutionManagement {
+    // Use Maven Central as the default repository (where Gradle will download dependencies) in all subprojects.
+    @Suppress("UnstableApiUsage")
+    repositories {
+        mavenCentral()
+        maven("https://jitpack.io")
+    }
+}
+```
+build.gradle
+```kts
+dependencies {
+    implementation("com.github.aisntb:rainy:v1.0.3-alpha")
+}
+```
 
-[Learn more about Gradle tasks](https://docs.gradle.org/current/userguide/command_line_interface.html#common_tasks).
+Main.kt
+```kt
+fun main(){
+    val bot = Bot("172.25.156.225:3000")
+    bot.addListener(MessageListener())
+    println("🌈 메세지 리스너가 등록되었습니다.")
+    Thread {
+        bot.start()
+    }.start()
 
-This project follows the suggested multi-module setup and consists of the `app` and `utils` subprojects.
-The shared build logic was extracted to a convention plugin located in `buildSrc`.
+    println("🌈 Rainy Server is running")
+}
+```
 
-This project uses a version catalog (see `gradle/libs.versions.toml`) to declare and version dependencies
-and both a build cache and a configuration cache (see `gradle.properties`).
+MessageListener.kt
+```kt
+class MessageListener: ListenerAdapter {
+    override fun onMessageReceived(event: MessageEvent) {
+        if (event.rawJson.user_id == "427101655") return //자기자신 메세지 무시
+
+        println("🌦️ [${event.sender}] ${event.message}")
+
+        if(event.message == "!텍스트"){
+            event.replyText("텍스트 테스트입니다.")
+
+        }else if(event.message == "!이미지"){
+            val file = encodeImageToBase64("C:\\Users\\hayeo\\OneDrive\\그림\\favorite.png")
+            event.replyImage(file)
+        }else if(event.message == "!이미지들"){
+            val file1 = encodeImageToBase64("C:\\Users\\hayeo\\OneDrive\\그림\\IMAGE\\1.jpg")
+            val file2 = encodeImageToBase64("C:\\Users\\hayeo\\OneDrive\\그림\\IMAGE\\2.jpeg")
+            val file3 = encodeImageToBase64("C:\\Users\\hayeo\\OneDrive\\그림\\IMAGE\\3.jpg")
+            val base64Images = "[\"$file1\", \"$file2\", \"$file3\"]"
+            event.replyImages(base64Images)
+        }
+    }
+}
+
+```
